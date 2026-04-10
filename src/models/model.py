@@ -19,8 +19,9 @@ def get_resnet(num_classes=3, freeze=True):
     model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
 
     if freeze:
-        for param in model.parameters():
-            param.requires_grad = False
+        for name, param in model.named_parameters():
+            if "fc" not in name:
+                param.requires_grad = False
 
     # Replace final layer
     in_features = model.fc.in_features
