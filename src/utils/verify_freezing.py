@@ -26,6 +26,8 @@ def check_model(model, model_name):
     for layer in trainable_layers:
         print("    ", layer)
 
+    print(f"\n Total trainable layers: {len(trainable_layers)}")
+
 def main():
     efficientnet = get_efficientnet()
     check_model(efficientnet, "EfficientNet")
