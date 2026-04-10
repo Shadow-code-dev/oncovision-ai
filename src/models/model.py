@@ -1,8 +1,13 @@
 import torch.nn as nn
 from torchvision import models
 
-def get_efficientnet(num_classes=3):
+def get_efficientnet(num_classes=3, freeze=True):
     model = models.efficientnet_b0(weights=models.EfficientNet_B0_Weights.DEFAULT)
+
+    # Freeze feature extractor
+    if freeze:
+        for param in model.features.parameters():
+            param.requires_grad = False
 
     # Replace classifier
     in_features = model.classifier[1].in_features
@@ -10,8 +15,12 @@ def get_efficientnet(num_classes=3):
 
     return model
 
-def get_resnet(num_classes=3):
+def get_resnet(num_classes=3, freeze=True):
     model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+
+    if freeze:
+        for param in model.parameters():
+            param.requires_grad = False
 
     # Replace final layer
     in_features = model.fc.in_features
