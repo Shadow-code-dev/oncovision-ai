@@ -87,11 +87,12 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(
         model.parameters(),
-        lr=0.001
+        lr=0.0003
     )
 
     # Training
-    epochs = 5
+    epochs = 10
+    best_val_acc = 0
 
     for epoch in range(epochs):
         train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer)
@@ -101,9 +102,11 @@ def train():
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc*100:.2f}%")
         print(f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc*100:.2f}%")
 
-    # Save Model
-    torch.save(model.state_dict(), MODEL_DIR / "efficientnet.pth")
-    print("\nModel saved!")
+        # Save Model
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            torch.save(model.state_dict(), MODEL_DIR / "best_efficientnet.pth")
+            print("\nBest Model saved!")
 
 if __name__ == "__main__":
     train()
