@@ -87,7 +87,7 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(
         model.parameters(),
-        lr=0.0003
+        lr=0.0001
     )
 
     # Training

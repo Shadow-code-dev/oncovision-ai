@@ -9,6 +9,10 @@ def get_efficientnet(num_classes=3, freeze=True):
         for param in model.features.parameters():
             param.requires_grad = False
 
+        # Unfreeze last block
+        for param in model.features[-1].parameters():
+            param.requires_grad = True
+
     # Replace classifier
     in_features = model.classifier[1].in_features
     model.classifier[1] = nn.Linear(in_features, num_classes)
