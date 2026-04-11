@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from pathlib import Path
+from tqdm import tqdm
 
 from src.preprocessing.dataloader import get_dataloaders
 from src.models.model import get_efficientnet
@@ -20,7 +21,9 @@ def train_one_epoch(model, loader, criterion, optimizer):
     correct = 0
     total = 0
 
-    for images, labels in loader:
+    loop = tqdm(loader, desc="Training", leave=False)
+
+    for images, labels in loop:
         images, labels = images.to(device), labels.to(device)
 
         optimizer.zero_grad()
@@ -37,6 +40,12 @@ def train_one_epoch(model, loader, criterion, optimizer):
         correct += (preds == labels).sum().item()
         total += labels.size(0)
 
+        # Update progress bar
+        loop.set_postfix(
+            loss=running_loss / (total + 1e-8),
+            acc=correct / total
+        )
+
     return running_loss / len(loader), correct / total
 
 def validate(model, loader, criterion):
@@ -45,8 +54,10 @@ def validate(model, loader, criterion):
     correct = 0
     total = 0
 
+    loop = tqdm(loader, desc="Validation", leave=False)
+
     with torch.inference_mode():
-        for images, labels in loader:
+        for images, labels in loop:
             images, labels = images.to(device), labels.to(device)
 
             outputs = model(images)
@@ -57,6 +68,11 @@ def validate(model, loader, criterion):
             _, preds = torch.max(outputs, 1)
             correct += (preds == labels).sum().item()
             total += labels.size(0)
+
+            loop.set_postfix(
+                loss=running_loss / (total + 1e-8),
+                acc=correct / total
+            )
 
     return running_loss / len(loader), correct / total
 
