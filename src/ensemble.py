@@ -48,7 +48,7 @@ def evaluate_ensemble():
             prob2 = F.softmax(out2, dim=1)
 
             # Ensemble
-            avg_prob = 0.7 * prob1 + 0.3 * prob2
+            avg_prob = 0.6 * prob1 + 0.4 * prob2
 
             preds = torch.argmax(avg_prob, dim=1)
 
