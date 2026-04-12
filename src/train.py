@@ -91,7 +91,7 @@ def train():
     )
 
     # Training
-    epochs = 10
+    epochs = 15
     best_val_acc = 0
 
     for epoch in range(epochs):
