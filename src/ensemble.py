@@ -19,8 +19,8 @@ def load_models():
     efficientnet = get_efficientnet().to(device)
     resnet = get_resnet().to(device)
 
-    efficientnet.load_state_dict(torch.load(EFFICIENTNET_PATH, map_location=device))
-    resnet.load_state_dict(torch.load(RESNET_PATH, map_location=device))
+    efficientnet.load_state_dict(torch.load(EFFICIENTNET_PATH, map_location=device, weights_only=True))
+    resnet.load_state_dict(torch.load(RESNET_PATH, map_location=device, weights_only=True))
 
     efficientnet.eval()
     resnet.eval()
@@ -47,8 +47,8 @@ def evaluate_ensemble():
             prob1 = F.softmax(out1, dim=1)
             prob2 = F.softmax(out2, dim=1)
 
-            # Ensemble (average)
-            avg_prob = (prob1 + prob2) / 2
+            # Ensemble
+            avg_prob = 0.3 * prob1 + 0.7 * prob2
 
             preds = torch.argmax(avg_prob, dim=1)
 
