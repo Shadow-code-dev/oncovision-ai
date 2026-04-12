@@ -27,6 +27,10 @@ def get_resnet(num_classes=3, freeze=True):
             if "fc" not in name:
                 param.requires_grad = False
 
+        # Unfreeze last block (layer4)
+        for param in model.layer4.parameters():
+            param.requires_grad = True
+
     # Replace final layer
     in_features = model.fc.in_features
     model.fc = nn.Linear(in_features, num_classes)
