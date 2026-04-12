@@ -81,13 +81,13 @@ def train():
     train_loader, val_loader, _ = get_dataloaders()
 
     # Model
-    model = get_efficientnet_v2().to(device)
+    model = get_resnet().to(device)
 
     # Loss Function & Optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(
         model.parameters(),
-        lr=0.0001
+        lr=5e-5
     )
 
     # Training
@@ -105,7 +105,7 @@ def train():
         # Save Model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), MODEL_DIR / "best_efficientnet_v2.pth")
+            torch.save(model.state_dict(), MODEL_DIR / "best_resnet.pth")
             print("\nBest Model saved!")
 
 if __name__ == "__main__":
