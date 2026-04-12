@@ -5,7 +5,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 from src.preprocessing.dataloader import get_dataloaders
-from src.models.model import get_efficientnet, get_resnet
+from src.models.model import get_efficientnet, get_resnet, get_efficientnet_v2
 
 # Device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -81,7 +81,7 @@ def train():
     train_loader, val_loader, _ = get_dataloaders()
 
     # Model
-    model = get_resnet().to(device)
+    model = get_efficientnet_v2().to(device)
 
     # Loss Function & Optimizer
     criterion = nn.CrossEntropyLoss()
@@ -105,7 +105,7 @@ def train():
         # Save Model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), MODEL_DIR / "best_resnet.pth")
+            torch.save(model.state_dict(), MODEL_DIR / "best_efficientnet_v2.pth")
             print("\nBest Model saved!")
 
 if __name__ == "__main__":

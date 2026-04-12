@@ -36,3 +36,18 @@ def get_resnet(num_classes=3, freeze=True):
     model.fc = nn.Linear(in_features, num_classes)
 
     return model
+
+def get_efficientnet_v2(num_classes=3, freeze=True):
+    model = models.efficientnet_v2_s(weights=models.EfficientNet_V2_S_Weights.DEFAULT)
+
+    if freeze:
+        for param in model.features.parameters():
+            param.requires_grad = False
+
+        for param in model.features[-2:].parameters():
+            param.requires_grad = True
+
+    in_features = model.classifier[1].in_features
+    model.classifier[1] = nn.Linear(in_features, num_classes)
+
+    return model
