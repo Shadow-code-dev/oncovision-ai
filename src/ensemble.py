@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 from pathlib import Path
 
-from src.models.model import get_efficientnet, get_resnet
+from src.models.model import get_efficientnet_v2, get_resnet
 from src.preprocessing.dataloader import get_dataloaders
 
 # Device
@@ -12,11 +12,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_DIR = BASE_DIR.parent / "models"
 
-EFFICIENTNET_PATH = MODEL_DIR / "best_efficientnet.pth"
+EFFICIENTNET_PATH = MODEL_DIR / "best_efficientnet_v2.pth"
 RESNET_PATH = MODEL_DIR / "best_resnet.pth"
 
 def load_models():
-    efficientnet = get_efficientnet().to(device)
+    efficientnet = get_efficientnet_v2().to(device)
     resnet = get_resnet().to(device)
 
     efficientnet.load_state_dict(torch.load(EFFICIENTNET_PATH, map_location=device, weights_only=True))
@@ -48,7 +48,7 @@ def evaluate_ensemble():
             prob2 = F.softmax(out2, dim=1)
 
             # Ensemble
-            avg_prob = 0.3 * prob1 + 0.7 * prob2
+            avg_prob = 0.7 * prob1 + 0.3 * prob2
 
             preds = torch.argmax(avg_prob, dim=1)
 
