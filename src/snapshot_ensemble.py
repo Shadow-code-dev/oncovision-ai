@@ -47,7 +47,8 @@ def evaluate():
                 probs.append(prob)
 
             # Average predictions
-            avg_prob = torch.mean(torch.stack(probs), dim=0)
+            weights = torch.tensor([0.1, 0.2, 0.3, 0.4], device=device)
+            avg_prob = sum(w * p for w, p in zip(weights, probs))
 
             preds = torch.argmax(avg_prob, dim=1)
 
