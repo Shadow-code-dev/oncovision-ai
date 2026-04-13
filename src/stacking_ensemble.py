@@ -21,7 +21,6 @@ class MetaModel(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(6, 16),
             nn.ReLU(),
-            nn.Dropout(0.3),
             nn.Linear(16, 3)
         )
 
@@ -70,8 +69,11 @@ def train_meta_model():
 
     efficientnet, resnet = load_models()
 
-    # Important: Use VAL set for meta training
-    X_meta, y_meta = create_meta_features(train_loader, efficientnet, resnet)
+    X_train, y_train = create_meta_features(train_loader, efficientnet, resnet)
+    X_val, y_val = create_meta_features(val_loader, efficientnet, resnet)
+
+    X_meta = torch.cat([X_train, X_val])
+    y_meta = torch.cat([y_train, y_val])
 
     meta_model = MetaModel().to(device)
 
@@ -81,7 +83,7 @@ def train_meta_model():
         lr=0.001
     )
 
-    epochs = 20
+    epochs = 50
 
     X_meta = X_meta.to(device)
     y_meta = y_meta.to(device)

@@ -81,13 +81,20 @@ def train():
     train_loader, val_loader, _ = get_dataloaders()
 
     # Model
-    model = get_resnet().to(device)
+    model = get_efficientnet_v2().to(device)
 
     # Loss Function & Optimizer
     criterion = nn.CrossEntropyLoss()
+
+    lr = 1e-4
     optimizer = optim.Adam(
         model.parameters(),
-        lr=5e-5
+        lr=lr
+    )
+    schedular = torch.optim.lr_scheduler.StepLR(
+        optimizer,
+        step_size=5,
+        gamma=0.5
     )
 
     # Training
@@ -99,14 +106,21 @@ def train():
         val_loss, val_acc = validate(model, val_loader, criterion)
 
         print(f"\nEpoch [{epoch+1}/{epochs}]")
+        print("LR:", optimizer.param_groups[0]["lr"])
+
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc*100:.2f}%")
         print(f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc*100:.2f}%")
 
         # Save Model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), MODEL_DIR / "best_resnet.pth")
+            torch.save(model.state_dict(), MODEL_DIR / "best_efficientnet_v2.pth")
             print("\nBest Model saved!")
+
+        # Save snapshots
+        torch.save(model.state_dict(), MODEL_DIR / f"snapshot_epoch_{epoch + 1}.pth")
+
+        schedular.step()
 
 if __name__ == "__main__":
     train()
