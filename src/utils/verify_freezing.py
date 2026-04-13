@@ -1,4 +1,4 @@
-from src.models.model import get_efficientnet, get_resnet
+from src.models.model import get_efficientnet, get_resnet, get_densenet
 
 def check_model(model, model_name):
     print(f"\n Checking model: {model_name}")
@@ -34,6 +34,9 @@ def main():
 
     resnet = get_resnet()
     check_model(resnet, "ResNet")
+
+    densenet = get_densenet()
+    check_model(densenet, "DenseNet")
 
 if __name__ == "__main__":
     main()

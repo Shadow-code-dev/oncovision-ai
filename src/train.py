@@ -5,7 +5,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 from src.preprocessing.dataloader import get_dataloaders
-from src.models.model import get_efficientnet, get_resnet, get_efficientnet_v2
+from src.models.model import get_efficientnet, get_resnet, get_efficientnet_v2, get_densenet
 
 # Device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -81,14 +81,14 @@ def train():
     train_loader, val_loader, _ = get_dataloaders()
 
     # Model
-    model = get_efficientnet_v2().to(device)
+    model = get_densenet().to(device)
 
     # Loss Function & Optimizer
     criterion = nn.CrossEntropyLoss()
 
     lr = 1e-4
     optimizer = optim.Adam(
-        model.parameters(),
+        filter(lambda p: p.requires_grad, model.parameters()),
         lr=lr
     )
     schedular = torch.optim.lr_scheduler.StepLR(
@@ -114,11 +114,11 @@ def train():
         # Save Model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), MODEL_DIR / "best_efficientnet_v2.pth")
+            torch.save(model.state_dict(), MODEL_DIR / "densenet_best.pth")
             print("\nBest Model saved!")
 
         # Save snapshots
-        torch.save(model.state_dict(), MODEL_DIR / f"snapshot_epoch_{epoch + 1}.pth")
+        # torch.save(model.state_dict(), MODEL_DIR / f"snapshot_epoch_{epoch + 1}.pth")
 
         schedular.step()
 

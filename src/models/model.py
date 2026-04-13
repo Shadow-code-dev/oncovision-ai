@@ -57,3 +57,17 @@ def get_efficientnet_v2(num_classes=3, freeze=True):
     model.classifier[1] = nn.Linear(in_features, num_classes)
 
     return model
+
+def get_densenet(num_classes=3, freeze=True):
+    model = models.densenet121(weights="IMAGENET1K_V1")
+
+    if freeze:
+        for name, param in model.named_parameters():
+            if "classifier" not in name and "denseblock4" not in name:
+                param.requires_grad = False
+
+    # Replace classifier
+    num_features = model.classifier.in_features
+    model.classifier = nn.Linear(num_features, num_classes)
+
+    return model
