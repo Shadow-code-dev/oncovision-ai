@@ -5,7 +5,7 @@ from PIL import Image
 from torchvision import transforms
 from pathlib import Path
 
-from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam import GradCAMPlusPlus
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from src.models.model import get_densenet
@@ -41,7 +41,7 @@ image = Image.open(image_path).convert("RGB")
 input_tensor = transform(image).unsqueeze(0).to(device)
 
 # Grad-CAM
-cam = GradCAM(model=model, target_layers=target_layers)
+cam = GradCAMPlusPlus(model=model, target_layers=target_layers)
 
 grayscale_cam = cam(input_tensor=input_tensor)[0]
 
