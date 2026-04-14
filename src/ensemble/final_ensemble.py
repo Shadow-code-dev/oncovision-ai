@@ -44,7 +44,7 @@ def evaluate():
             prob1 = torch.softmax(out1, dim=1)
             prob2 = torch.softmax(out2, dim=1)
 
-            # 🔥 Weighted Ensemble
+            # Weighted Ensemble
             avg_prob = 0.65 * prob1 + 0.35 * prob2
 
             preds = torch.argmax(avg_prob, dim=1)

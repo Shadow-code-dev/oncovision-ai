@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from pathlib import Path
 
-from src.models.model import get_efficientnet_v2, get_resnet
+from src.models.model import get_efficientnet_v2, get_resnet, get_densenet
 from src.preprocessing.dataloader import get_dataloaders
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent
 MODEL_DIR = BASE_DIR.parent / "models"
 
 EFFICIENTNET_PATH = MODEL_DIR / "best_efficientnet_v2.pth"
-RESNET_PATH = MODEL_DIR / "best_resnet.pth"
+DENSENET_PATH = MODEL_DIR / "densenet_best.pth"
 
 # Meta Model
 class MetaModel(nn.Module):
@@ -29,18 +29,18 @@ class MetaModel(nn.Module):
 
 def load_models():
     efficientnet = get_efficientnet_v2().to(device)
-    resnet = get_resnet().to(device)
+    densenet = get_densenet().to(device)
 
     efficientnet.load_state_dict(torch.load(EFFICIENTNET_PATH, map_location=device, weights_only=True))
-    resnet.load_state_dict(torch.load(RESNET_PATH, map_location=device, weights_only=True))
+    densenet.load_state_dict(torch.load(DENSENET_PATH, map_location=device, weights_only=True))
 
     efficientnet.eval()
-    resnet.eval()
+    densenet.eval()
 
-    return efficientnet, resnet
+    return efficientnet, densenet
 
 # Create meta features from the VAL dataset (important!)
-def create_meta_features(loader, efficientnet, resnet):
+def create_meta_features(loader, efficientnet, densenet):
     features = []
     labels_list = []
 
@@ -49,7 +49,7 @@ def create_meta_features(loader, efficientnet, resnet):
             images = images.to(device)
 
             out1 = efficientnet(images)
-            out2 = resnet(images)
+            out2 = densenet(images)
 
             prob1 = torch.softmax(out1, dim=1)
             prob2 = torch.softmax(out2, dim=1)
@@ -67,10 +67,10 @@ def create_meta_features(loader, efficientnet, resnet):
 def train_meta_model():
     train_loader, val_loader, _ = get_dataloaders()
 
-    efficientnet, resnet = load_models()
+    efficientnet, densenet = load_models()
 
-    X_train, y_train = create_meta_features(train_loader, efficientnet, resnet)
-    X_val, y_val = create_meta_features(val_loader, efficientnet, resnet)
+    X_train, y_train = create_meta_features(train_loader, efficientnet, densenet)
+    X_val, y_val = create_meta_features(val_loader, efficientnet, densenet)
 
     X_meta = torch.cat([X_train, X_val])
     y_meta = torch.cat([y_train, y_val])
@@ -106,7 +106,7 @@ def train_meta_model():
 def evaluate(meta_model):
     _, _, test_loader = get_dataloaders()
 
-    efficientnet, resnet = load_models()
+    efficientnet, densenet = load_models()
 
     correct, total = 0, 0
 
@@ -117,7 +117,7 @@ def evaluate(meta_model):
             images, labels = images.to(device), labels.to(device)
 
             out1 = efficientnet(images)
-            out2 = resnet(images)
+            out2 = densenet(images)
 
             prob1 = torch.softmax(out1, dim=1)
             prob2 = torch.softmax(out2, dim=1)
