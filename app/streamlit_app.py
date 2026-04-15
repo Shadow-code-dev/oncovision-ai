@@ -20,8 +20,12 @@ if uploaded_file is not None:
         }
 
         # Prediction
-        pred_response = requests.post(f"{API_URL}/predict", files=files)
-        pred_data = pred_response.json()
+        try:
+            pred_response = requests.post(f"{API_URL}/predict", files=files)
+            pred_data = pred_response.json()
+        except:
+            st.error("FastAPI server is not running. Please start it first and try again.")
+            st.stop()
 
         st.write("### Prediction: ")
         st.write(pred_data)
