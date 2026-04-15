@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from app.inference import predict_image
+from app.explain import generate_gradcam
+from fastapi.responses import Response
 
 app = FastAPI()
 
@@ -17,3 +19,10 @@ async def predict(file: UploadFile = File(...)):
         "prediction": class_names[int(pred)],
         "confidence": float(confidence)
     }
+
+@app.post("/explain")
+async def explain(file: UploadFile = File(...)):
+    image_bytes = await file.read()
+    heatmap_bytes = generate_gradcam(image_bytes)
+
+    return Response(content=heatmap_bytes, media_type="image/jpeg")
