@@ -18,14 +18,23 @@ Y_PROBS_PATH = BASE_DIR / "outputs" / "y_probs.npy"
 
 API_URL = "http://127.0.0.1:8000"
 
-st.title("OncoVision AI")
-st.subheader("Breast Cancer Detection with Explainability")
+st.set_page_config(
+    page_title="OncoVision AI",
+    page_icon="👁️",
+    layout="wide"
+)
+
+st.title("👁️ OncoVision AI")
+st.markdown("### Breast Cancer Detection with Explainability")
+st.markdown("---")
 
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
+col1, col2 = st.columns(2)
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", use_container_width=True)
+    with col1:
+        st.image(image, caption="Uploaded Image", use_container_width=True)
 
     if st.button("Predict"):
         files = {
@@ -36,26 +45,41 @@ if uploaded_file is not None:
         try:
             pred_response = requests.post(f"{API_URL}/predict", files=files)
             pred_data = pred_response.json()
+            pred_label = pred_data["prediction"]
         except:
             st.error("FastAPI server is not running. Please start it first and try again.")
             st.stop()
 
-        st.write("### Prediction: ")
-        st.write(pred_data)
+        with col2:
+            st.write("### Prediction Results: ")
+            st.success(f"Prediction: {pred_label}")
+            st.info(f"Confidence Score: {pred_data['confidence']*100:.2f}%")
 
-        # Model Performance
-        st.write("### Model Performance: ")
+            st.write("### Class Probabilities: ")
+            probs = pred_data["probabilities"]
+            class_names = ["benign", "malignant", "normal"]
 
-        if METRICS_PATH.exists():
-            with open(METRICS_PATH, "r") as f:
-                metrics = json.load(f)
+            for i, prob in enumerate(probs):
+                label = class_names[i]
 
-            st.metric("Accuracy", f"{metrics['accuracy']*100:.2f}%")
-            st.metric("Precision", f"{metrics['precision']*100:.2f}%")
-            st.metric("Recall", f"{metrics['recall']*100:.2f}%")
-            st.metric("F1 Score", f"{metrics['f1_score']*100:.2f}%")
-        else:
-            st.warning("Metrics file not found. Run evaluation first.")
+                if label == pred_label:
+                    st.progress(float(prob), text=f"👉 {label}: {prob*100:.2f}%")
+                else:
+                    st.progress(float(prob), text=f"{label}: {prob*100:.2f}%")
+
+            # Model Performance
+            st.write("### Model Performance: ")
+
+            if METRICS_PATH.exists():
+                with open(METRICS_PATH, "r") as f:
+                    metrics = json.load(f)
+
+                st.metric("Accuracy", f"{metrics['accuracy']*100:.2f}%")
+                st.metric("Precision", f"{metrics['precision']*100:.2f}%")
+                st.metric("Recall", f"{metrics['recall']*100:.2f}%")
+                st.metric("F1 Score", f"{metrics['f1_score']*100:.2f}%")
+            else:
+                st.warning("Metrics file not found. Run evaluation first.")
 
         # Confusion Metrics
         st.write("### Confusion Matrix: ")

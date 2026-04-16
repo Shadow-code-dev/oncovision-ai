@@ -46,4 +46,4 @@ def predict_image(image_bytes):
         pred = torch.argmax(avg_prob, dim=1).item()
         confidence = torch.max(avg_prob).item()
 
-    return pred, confidence
+    return pred, confidence, avg_prob

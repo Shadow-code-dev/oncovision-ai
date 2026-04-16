@@ -12,12 +12,13 @@ def home():
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     image_bytes = await file.read()
-    pred, confidence = predict_image(image_bytes)
+    pred, confidence, avg_prob = predict_image(image_bytes)
     class_names = ["benign", "malignant", "normal"]
 
     return {
         "prediction": class_names[int(pred)],
-        "confidence": float(confidence)
+        "confidence": float(confidence),
+        "probabilities": avg_prob.squeeze().tolist()
     }
 
 @app.post("/explain")
