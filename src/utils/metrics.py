@@ -76,7 +76,8 @@ def evaluate():
     print(f"F1 Score: {f1:.4f}")
 
     print("\n Confusion Matrix: ")
-    print(confusion_matrix(all_labels, all_preds))
+    cm = confusion_matrix(all_labels, all_preds)
+    print(cm)
 
     print("\n Classification Report: ")
     print(classification_report(all_labels, all_preds))
@@ -88,8 +89,13 @@ def evaluate():
         "f1_score": f1,
     }
 
+    cm_data = cm.tolist()
+
     with open(BASE_DIR / "outputs" / "metrics.json", "w") as f:
         json.dump(metrics_data, f, indent=4)
+
+    with open(BASE_DIR / "outputs" / "confusion_matrix.json", "w") as f:
+        json.dump(cm_data, f, indent=4)
 
 if __name__ == "__main__":
     evaluate()
