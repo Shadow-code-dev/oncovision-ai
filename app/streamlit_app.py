@@ -7,10 +7,14 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 METRICS_PATH = BASE_DIR / "outputs" / "metrics.json"
 CM_PATH = BASE_DIR / "outputs" / "confusion_matrix.json"
+Y_TRUE_PATH = BASE_DIR / "outputs" / "y_true.npy"
+Y_PROBS_PATH = BASE_DIR / "outputs" / "y_probs.npy"
 
 API_URL = "http://127.0.0.1:8000"
 
@@ -81,6 +85,35 @@ if uploaded_file is not None:
             st.pyplot(fig)
         else:
             st.warning("Confusion matrix not found. Run evaluation first.")
+
+        # ROC Curve
+        st.write("### ROC Curve: ")
+
+        if Y_TRUE_PATH.exists() and Y_PROBS_PATH.exists():
+            y_true = np.load(Y_TRUE_PATH)
+            y_probs = np.load(Y_PROBS_PATH)
+
+            n_classes = y_probs.shape[1]
+            y_true_bin = label_binarize(y_true, classes=list(range(n_classes)))
+
+            fig, ax = plt.subplots()
+
+            for i in range(n_classes):
+                fpr, tpr, _ = roc_curve(y_true_bin[:, i], y_probs[:, i])
+                roc_auc = auc(fpr, tpr)
+
+                ax.plot(fpr, tpr, label=f"Class {i} (AUC = {roc_auc:.2f})")
+
+            ax.plot([0, 1], [0, 1], linestyle="--")
+
+            ax.set_xlabel("False Positive Rate")
+            ax.set_ylabel("True Positive Rate")
+            ax.set_title("ROC Curve")
+            ax.legend()
+
+            st.pyplot(fig)
+        else:
+            st.warning("ROC data not found. Run evaluation first.")
 
         # Grad-CAM
         explain_response = requests.post(f"{API_URL}/explain", files=files)

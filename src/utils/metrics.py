@@ -8,6 +8,7 @@ confusion_matrix,
 classification_report
 )
 import json
+import numpy as np
 
 from src.preprocessing.dataloader import get_dataloaders
 from src.models.model import get_efficientnet_v2, get_densenet
@@ -41,6 +42,7 @@ def evaluate():
 
     all_preds = []
     all_labels = []
+    all_probs = []
 
     with torch.inference_mode():
         for images, labels in test_loader:
@@ -62,6 +64,7 @@ def evaluate():
 
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.numpy())
+            all_probs.extend(avg_prob.cpu().numpy())
 
     # Metrics
     acc = accuracy_score(all_labels, all_preds)
@@ -96,6 +99,9 @@ def evaluate():
 
     with open(BASE_DIR / "outputs" / "confusion_matrix.json", "w") as f:
         json.dump(cm_data, f, indent=4)
+
+    np.save(BASE_DIR / "outputs" / "y_true.npy", np.array(all_labels))
+    np.save(BASE_DIR / "outputs" / "y_probs.npy", np.array(all_probs))
 
 if __name__ == "__main__":
     evaluate()
