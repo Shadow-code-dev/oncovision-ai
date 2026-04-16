@@ -2,6 +2,11 @@ import streamlit as st
 import requests
 from PIL import Image
 import io
+import json
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+METRICS_PATH = BASE_DIR / "outputs" / "metrics.json"
 
 API_URL = "http://127.0.0.1:8000"
 
@@ -29,6 +34,20 @@ if uploaded_file is not None:
 
         st.write("### Prediction: ")
         st.write(pred_data)
+
+        # Model Performance
+        st.write("### Model Performance: ")
+
+        if METRICS_PATH.exists():
+            with open(METRICS_PATH, "r") as f:
+                metrics = json.load(f)
+
+            st.metric("Accuracy", f"{metrics['accuracy']*100:.2f}%")
+            st.metric("Precision", f"{metrics['precision']*100:.2f}%")
+            st.metric("Recall", f"{metrics['recall']*100:.2f}%")
+            st.metric("F1 Score", f"{metrics['f1_score']*100:.2f}%")
+        else:
+            st.warning("Metrics file not found. Run evaluation first.")
 
         # Grad-CAM
         explain_response = requests.post(f"{API_URL}/explain", files=files)

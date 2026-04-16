@@ -7,6 +7,7 @@ f1_score,
 confusion_matrix,
 classification_report
 )
+import json
 
 from src.preprocessing.dataloader import get_dataloaders
 from src.models.model import get_efficientnet_v2, get_densenet
@@ -79,6 +80,16 @@ def evaluate():
 
     print("\n Classification Report: ")
     print(classification_report(all_labels, all_preds))
+
+    metrics_data = {
+        "accuracy": acc,
+        "precision": precision,
+        "recall": recall,
+        "f1_score": f1,
+    }
+
+    with open(BASE_DIR / "outputs" / "metrics.json", "w") as f:
+        json.dump(metrics_data, f, indent=4)
 
 if __name__ == "__main__":
     evaluate()
