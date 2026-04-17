@@ -6,4 +6,9 @@ __pycache__/
 venv/
 *.pth
 data/
-outputs/
+outputs/*
+
+!outputs/metrics.json
+!outputs/confusion_matrix.json
+!outputs/y_true.npy
+!outputs/y_probs.npy

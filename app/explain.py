@@ -10,12 +10,16 @@ from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from src.models.model import get_efficientnet_v2
+from src.utils.download import download_model
+from src.utils.config import EFFICIENTNET_URL
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load Model
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models"
+
+download_model(EFFICIENTNET_URL, MODEL_DIR / "best_efficientnet_v2.pth")
 
 model = get_efficientnet_v2().to(device)
 model.load_state_dict(

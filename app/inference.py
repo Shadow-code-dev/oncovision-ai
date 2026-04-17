@@ -5,11 +5,16 @@ from PIL import Image
 import io
 
 from src.models.model import get_efficientnet_v2, get_densenet
+from src.utils.download import download_model
+from src.utils.config import EFFICIENTNET_URL, DENSENET_URL
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models"
+
+download_model(EFFICIENTNET_URL, MODEL_DIR / "best_efficientnet_v2.pth")
+download_model(DENSENET_URL, MODEL_DIR / "densenet_best.pth")
 
 # Load models once
 efficientnet = get_efficientnet_v2().to(device)

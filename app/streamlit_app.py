@@ -43,14 +43,15 @@ if uploaded_file is not None:
             "file": uploaded_file.getvalue()
         }
 
-        # Prediction
-        try:
-            pred_response = requests.post(f"{API_URL}/predict", files=files)
-            pred_data = pred_response.json()
-            pred_label = pred_data["prediction"]
-        except:
-            st.error("FastAPI server is not running. Please start it first and try again.")
-            st.stop()
+        with st.spinner("Analyzing image... Please wait"):
+            # Prediction
+            try:
+                pred_response = requests.post(f"{API_URL}/predict", files=files)
+                pred_data = pred_response.json()
+                pred_label = pred_data["prediction"]
+            except:
+                st.error("FastAPI server is not running. Please start it first and try again.")
+                st.stop()
 
         with col2:
             st.write("### Prediction Results: ")
@@ -136,7 +137,7 @@ if uploaded_file is not None:
                     fpr, tpr, _ = roc_curve(y_true_bin[:, i], y_probs[:, i])
                     roc_auc = auc(fpr, tpr)
 
-                    ax.plot(fpr, tpr, label=f"Class {i} (AUC = {roc_auc:.2f})")
+                    ax.plot(fpr, tpr, label=f"{class_names[i]} (AUC = {roc_auc:.2f})")
 
                 ax.plot([0, 1], [0, 1], linestyle="--")
 
