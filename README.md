@@ -12,6 +12,7 @@ This project demonstrates a complete end-to-end ML pipeline:
 * Explainability
 
 ## Tech Stack
+* Python
 * PyTorch
 * FastAPI
 * Streamlit
