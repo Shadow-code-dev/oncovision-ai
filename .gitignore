@@ -7,7 +7,7 @@ venv/
 *.pth
 data/
 outputs/*
-
+!screenshots/
 !outputs/metrics.json
 !outputs/confusion_matrix.json
 !outputs/y_true.npy

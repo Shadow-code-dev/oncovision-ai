@@ -42,12 +42,40 @@ This system aims to:
 ## Architecture
 User → Streamlit UI → FastAPI → Ensemble Model → Prediction + Grad-CAM
 
-## How to Run
-1. Clone Repository
+## Demo
 
+### User Interface
+![UI](outputs/screenshots/ui.png)
+
+---
+
+### Prediction Output
+![Prediction](outputs/screenshots/prediction.png)
+![Prediction](outputs/screenshots/prediction2.png)
+
+---
+
+### Grad-CAM Explainability
+![GradCAM](outputs/screenshots/gradcam.png)
+
+---
+
+### Confusion Matrix
+![Confusion Matrix](outputs/screenshots/confusion_matrix.png)
+
+---
+
+### ROC Curve
+![ROC Curve](outputs/screenshots/roc_curve.png)
+
+## How to Run
+```bash
+1. Clone Repository
     git clone https://github.com/Shadow-code-dev/oncovision-ai.git
-    
     cd oncovision-ai
 2. Install Dependencies
-
     pip install -r requirements.txt
+3. Start Backend (FastAPI)
+   uvicorn app.main:app --reload
+4. Start Frontend (Streamlit)
+   streamlit run app/streamlit_app.py
